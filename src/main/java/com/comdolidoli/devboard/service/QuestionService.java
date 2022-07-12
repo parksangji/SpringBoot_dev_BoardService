@@ -4,8 +4,14 @@ import com.comdolidoli.devboard.entity.QuestionEntity;
 import com.comdolidoli.devboard.repository.QuestionRepository;
 import com.comdolidoli.devboard.setting.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,5 +31,19 @@ public class QuestionService {
         }else{
             throw new DataNotFoundException("question not found");
         }
+    }
+    public Page<QuestionEntity> getList(int page) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        return this.questionRepository.findAll(pageable);
+    }
+
+    public void createQuestion(String subject, String content) {
+        QuestionEntity questionEntity = new QuestionEntity();
+        questionEntity.setSubject(subject);
+        questionEntity.setContent(content);
+        questionEntity.setCreateDate(LocalDateTime.now());
+        questionRepository.save(questionEntity);
     }
 }
