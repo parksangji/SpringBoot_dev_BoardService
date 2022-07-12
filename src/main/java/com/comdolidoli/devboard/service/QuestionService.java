@@ -1,6 +1,7 @@
 package com.comdolidoli.devboard.service;
 
 import com.comdolidoli.devboard.entity.QuestionEntity;
+import com.comdolidoli.devboard.entity.UserEntity;
 import com.comdolidoli.devboard.repository.QuestionRepository;
 import com.comdolidoli.devboard.config.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +40,12 @@ public class QuestionService {
         return this.questionRepository.findAll(pageable);
     }
 
-    public void createQuestion(String subject, String content) {
+    public void createQuestion(String subject, String content, UserEntity userEntity) {
         QuestionEntity questionEntity = new QuestionEntity();
         questionEntity.setSubject(subject);
         questionEntity.setContent(content);
         questionEntity.setCreateDate(LocalDateTime.now());
+        questionEntity.setAuthor(userEntity);
         questionRepository.save(questionEntity);
     }
 }

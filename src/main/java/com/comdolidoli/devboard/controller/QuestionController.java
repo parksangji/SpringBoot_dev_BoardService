@@ -1,19 +1,23 @@
 package com.comdolidoli.devboard.controller;
 
 import com.comdolidoli.devboard.entity.QuestionEntity;
+import com.comdolidoli.devboard.entity.UserEntity;
 import com.comdolidoli.devboard.form.AnswerForm;
 import com.comdolidoli.devboard.form.QuestionForm;
 import com.comdolidoli.devboard.repository.QuestionRepository;
 import com.comdolidoli.devboard.service.QuestionService;
+import com.comdolidoli.devboard.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RequestMapping("/question")
@@ -22,7 +26,7 @@ import java.util.List;
 public class QuestionController {
 
     private final QuestionService  questionService;
-
+    private final UserService userService;
     @RequestMapping("/list")
     public String QuestionList(Model model,@RequestParam(value="page", defaultValue="0") int page) {
         Page<QuestionEntity> paging = this.questionService.getList(page);
@@ -37,17 +41,20 @@ public class QuestionController {
         return "question_list_id";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String CreateQuestion(QuestionForm questionForm){
         return "question_form";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public String CreateQuestion(@Valid QuestionForm questionForm, BindingResult bindingResult){
+    public String CreateQuestion(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal){
         if(bindingResult.hasErrors()){
             return "question_form";
         }
-        this.questionService.createQuestion(questionForm.getSubject(),questionForm.getContent());
+        UserEntity userEntity = this.userService.getUser(principal.getName());
+        this.questionService.createQuestion(questionForm.getSubject(),questionForm.getContent(),userEntity);
         return "redirect:/question/list";
     }
 }

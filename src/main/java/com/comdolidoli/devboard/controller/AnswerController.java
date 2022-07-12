@@ -1,10 +1,13 @@
 package com.comdolidoli.devboard.controller;
 
 import com.comdolidoli.devboard.entity.QuestionEntity;
+import com.comdolidoli.devboard.entity.UserEntity;
 import com.comdolidoli.devboard.form.AnswerForm;
 import com.comdolidoli.devboard.service.AnswerService;
 import com.comdolidoli.devboard.service.QuestionService;
+import com.comdolidoli.devboard.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RequestMapping("/answer")
 @RequiredArgsConstructor
@@ -21,16 +25,18 @@ import javax.validation.Valid;
 public class AnswerController {
     private final QuestionService questionService;
     private final AnswerService answerService;
-
+    private final UserService userService;
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create/{id}")
     public String createAnswer(Model model, @PathVariable("id") Integer id,
-                               @Valid AnswerForm answerForm, BindingResult bindingResult){
+                               @Valid AnswerForm answerForm, BindingResult bindingResult, Principal principal){
         QuestionEntity questionEntity = questionService.getQuestion(id);
+        UserEntity userEntity = this.userService.getUser(principal.getName());
         if(bindingResult.hasErrors()){
             model.addAttribute("question", questionEntity);
             return "question_list_id";
         }
-        this.answerService.create(questionEntity,answerForm.getContent());
+        this.answerService.create(questionEntity,answerForm.getContent(),userEntity);
         return String.format("redirect:/question/list/%s",id);
     }
 }
