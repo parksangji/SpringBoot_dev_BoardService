@@ -2,7 +2,7 @@ package com.comdolidoli.devboard.service;
 
 import com.comdolidoli.devboard.entity.QuestionEntity;
 import com.comdolidoli.devboard.repository.QuestionRepository;
-import com.comdolidoli.devboard.setting.DataNotFoundException;
+import com.comdolidoli.devboard.config.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
