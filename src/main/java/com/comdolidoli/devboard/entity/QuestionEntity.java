@@ -6,6 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -24,9 +25,14 @@ public class QuestionEntity {
 
     private LocalDateTime createDate;
 
+    private LocalDateTime modifyDate;
+
     @OneToMany(mappedBy = "question",cascade = CascadeType.REMOVE)
     private List<AnswerEntity> answerEntityList;
 
     @ManyToOne
     private UserEntity author;
+
+    @ManyToMany
+    Set<UserEntity> voter;
 }
